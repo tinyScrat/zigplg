@@ -68,3 +68,44 @@ test "if expression" {
 
     try std.testing.expect(c == 2);
 }
+
+test "while" {
+    var a: u8 = 1;
+    while (a < 100) {
+        a *= 2;
+    }
+
+    try std.testing.expect(a == 128);
+}
+
+test "while 2" {
+    var sum: u8 = 0;
+    var i: u8 = 1;
+    while (i <= 10) : (i += 1) {
+        sum += i;
+    }
+
+    try std.testing.expect(sum == 55);
+}
+
+test "while 3" {
+    var sum: u8 = 0;
+    var i: u8 = 1;
+    while (i <= 3) : (i += 1) {
+        if (i == 2) continue;
+        sum += i;
+    }
+
+    try std.testing.expect(sum == 4);
+}
+
+test "while 4" {
+    var sum: u8 = 0;
+    var i: u8 = 1;
+    while (i <= 3) : (i += 1) {
+        if (i == 2) break;
+        sum += i;
+    }
+
+    try std.testing.expect(sum == 1);
+}
