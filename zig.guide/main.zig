@@ -109,3 +109,22 @@ test "while 4" {
 
     try std.testing.expect(sum == 1);
 }
+
+test "for" {
+    const string = [_]u8{ 'h', 'e', 'l', 'l', 'o' };
+
+    for (string, 0..) |character, index| {
+        _ = character;
+        _ = index;
+    }
+
+    for (string) |character| {
+        _ = character;
+    }
+
+    for (string, 0..) |_, index| {
+        _ = index;
+    }
+
+    for (string) |_| {}
+}
