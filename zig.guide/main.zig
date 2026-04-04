@@ -128,3 +128,23 @@ test "for" {
 
     for (string) |_| {}
 }
+
+fn addFive(a: i32) i32 {
+    return a + 5;
+}
+
+test "function" {
+    const y = addFive(0);
+    try std.testing.expect(@TypeOf(y) == i32);
+    try std.testing.expect(y == 5);
+}
+
+fn fibonacci(n: u32) u32 {
+    if (n == 0 or n == 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+test "test recursion" {
+    const n = fibonacci(10);
+    try std.testing.expect(n == 55);
+}
