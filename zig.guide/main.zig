@@ -168,3 +168,79 @@ test "defer2" {
 
     try std.testing.expect(n == 3.5);
 }
+
+const FileOpenError = error{
+    AccessDeined,
+    OutOfMemory,
+    FileNotFound,
+};
+
+const AllocationError = error{OutOfMemory};
+
+test "coerce error from subset to superset" {
+    const oom: FileOpenError = AllocationError.OutOfMemory;
+    try std.testing.expect(oom == FileOpenError.OutOfMemory);
+}
+
+test "error union" {
+    const maybe_err: AllocationError!u16 = 10;
+    const no_err = maybe_err catch 0; // catch provide fallback if the value is error
+
+    try std.testing.expect(@TypeOf(no_err) == u16);
+    try std.testing.expect(no_err == 10);
+}
+
+fn failingFunction() error{Oops}!void {
+    return error.Oops;
+}
+
+test "returning an error" {
+    failingFunction() catch |err| {
+        try std.testing.expect(err == error.Oops);
+        return;
+    };
+}
+
+fn failFn() error{Oops}!i32 {
+    try failingFunction(); // try is a shorthand for x catch |err| return err;
+    return 12;
+}
+
+test "try" {
+    const n = failFn() catch |err| {
+        try std.testing.expect(err == error.Oops);
+        return;
+    };
+
+    try std.testing.expect(n == 12); // never reach
+}
+
+var problems: u32 = 98;
+
+fn failFnCounter() error{Oops}!void {
+    errdefer problems += 1; // run only if the current block return error
+    try failingFunction();
+}
+
+test "failing counter" {
+    failFnCounter() catch |err| {
+        try std.testing.expect(err == error.Oops);
+        try std.testing.expect(problems == 99);
+        return;
+    };
+}
+
+fn createFile() !void { // error set can be inferred, which is the set of all possible error returned by the function
+    return error.AccessDeined;
+}
+
+test "omit error set" {
+    const err: error{AccessDeined}!void = createFile();
+
+    _ = err catch {}; // ignore error union value
+}
+
+// error set can be merged
+const A = error{ Failed1, Failed2 };
+const B = error{ Failed3, Failed4 };
+const C = A || B;
