@@ -148,3 +148,23 @@ test "test recursion" {
     const n = fibonacci(10);
     try std.testing.expect(n == 55);
 }
+
+test "defer" {
+    var n: i16 = 5;
+    {
+        defer n += 1;
+        try std.testing.expect(n == 5);
+    }
+
+    try std.testing.expect(n == 6);
+}
+
+test "defer2" {
+    var n: f32 = 5;
+    {
+        defer n += 1;
+        defer n /= 2;
+    }
+
+    try std.testing.expect(n == 3.5);
+}
