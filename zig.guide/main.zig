@@ -1,4 +1,5 @@
 const std = @import("std");
+const expect = std.testing.expect;
 
 pub fn main() !void {
     std.debug.print("Hello, {s}!\n", .{"Zig"});
@@ -244,3 +245,29 @@ test "omit error set" {
 const A = error{ Failed1, Failed2 };
 const B = error{ Failed3, Failed4 };
 const C = A || B;
+
+test "switch statement" {
+    var x: i8 = 10;
+    switch (x) {
+        -1...1 => {
+            x = -x;
+        },
+        10, 100 => {
+            x = @divExact(x, 10);
+        },
+        else => {},
+    }
+
+    try std.testing.expect(x == 1);
+}
+
+test "switch expression" {
+    var x: i8 = 10;
+    x = switch (x) {
+        -1...1 => -x,
+        10, 100 => @divExact(x, 10),
+        else => x,
+    };
+
+    try expect(x == 1);
+}
