@@ -271,3 +271,34 @@ test "switch expression" {
 
     try expect(x == 1);
 }
+
+test "out of bound" {
+    // disable runtime safty
+    @setRuntimeSafety(false);
+    const a = [_]u8{ 1, 2, 3 };
+    var index: u8 = 5;
+    const b = a[index];
+
+    _ = b;
+    index = index;
+}
+
+test "unreachable" {
+    const a: i32 = 5;
+    const b = if (true) a else unreachable;
+
+    _ = b;
+}
+
+fn asciiToUpper(c: u8) u8 {
+    return switch (c) {
+        'a'...'z' => c + 'A' - 'a',
+        'A'...'Z' => c,
+        else => unreachable,
+    };
+}
+
+test "unreachable2" {
+    try expect(asciiToUpper('a') == 'A');
+    try expect(asciiToUpper('A') == 'A');
+}
